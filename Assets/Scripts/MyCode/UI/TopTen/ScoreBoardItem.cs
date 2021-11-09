@@ -31,7 +31,7 @@ namespace Project
 		{
 			m_image.color = (_rank % 2 == 0) ? m_evenColor : m_oddColor;
 
-			m_rankTextTMP.SetText((_rank < 10) ? $"0{_rank}" : $"{_rank}");
+			m_rankTextTMP.SetText((_rank < 10) ? $" {_rank}" : $"{_rank}");
 
 			bool hasData = _scoreData != null;
 

@@ -26,7 +26,7 @@ namespace Project.UI
 			for (int i = 0; i < ScoreManager.Instance.ScoreHelper.TopTen.Data.Length; i++)
 			{
 				ScoreBoardItem scoreboardItem = Instantiate(m_scoreboardItemPrefab, m_scoreContainer);
-				scoreboardItem.Initialize(i, null);
+				scoreboardItem.Initialize(i + 1, null);
 				m_scoreboardIems.Add(scoreboardItem);
 			}
 
@@ -43,7 +43,7 @@ namespace Project.UI
 			{
 				for (int i = 0; i < m_scoreboardIems.Count; i++)
 				{
-					m_scoreboardIems[i].Initialize(i, ScoreManager.Instance.ScoreHelper.TopTen.Data[i]);
+					m_scoreboardIems[i].Initialize(i+1, ScoreManager.Instance.ScoreHelper.TopTen.Data[i]);
 				}
 			}
 		}

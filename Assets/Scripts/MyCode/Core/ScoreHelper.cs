@@ -42,7 +42,7 @@ namespace Project
 
         public void SetScore(string _name, int _score)
         {
-			string nameString = (!string.IsNullOrEmpty(_name) ? _name : $"<mark><size=80%><i>anonymous</i></size></mark>");
+			string nameString = (!string.IsNullOrEmpty(_name) ? _name : $"<mark><i>anonymous</i></mark>");
 
             TopTen.Data[0] = new ScoreData() {Name = nameString, Score = _score};
 			SaveData();
