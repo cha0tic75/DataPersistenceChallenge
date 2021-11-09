@@ -21,6 +21,7 @@ namespace Project.Game
 		#endregion
 
 		#region Inspector Assigned Field(s):
+		[SerializeField] private BrickManager m_brickManager;
 		[SerializeField] private DeathZone m_deathZone;
 		[SerializeField] private HighscoreInputWindow m_highscoreInputWindow;
 		[SerializeField] private TextMeshProUGUI m_currentScoreTMP;
@@ -29,6 +30,7 @@ namespace Project.Game
 
 		#region Internal State Field(s):
 		private int m_currentScore;
+		private Coroutine m_endGameCoroutine = null;
 		#endregion
 		
 		#region Properties:
@@ -47,13 +49,20 @@ namespace Project.Game
 			Instance = this;
 		}
 
-		private void OnEnable() => m_deathZone.OnGameOverEvent += DeathZone_OnGameOverCallback;
-		private void Start()
-        {
-            SetBestScoreText();
-        }
+		private void OnEnable()
+		{
+			m_deathZone.OnGameOverEvent += DeathZone_OnGameOverCallback;
+			m_brickManager.OnWinConditionEvent += BrickManager_OnWinConditionCallback;
+		}
 
-        private void OnDisable() => m_deathZone.OnGameOverEvent -= DeathZone_OnGameOverCallback;
+        private void Start() => ResetBestScoreText();
+
+		private void OnDisable()
+		{
+			m_deathZone.OnGameOverEvent -= DeathZone_OnGameOverCallback;
+			m_brickManager.OnWinConditionEvent -= BrickManager_OnWinConditionCallback;
+			StopEndGameCoroutine();
+		}
 		#endregion
 		
 		#region Public API:
@@ -62,20 +71,23 @@ namespace Project.Game
 			m_currentScore += _pointsToAdd;
 			m_currentScoreTMP.text = $"Score : {m_currentScore}";
 		}
-		#endregion
 
-		#region Internally Used Method(s):
-        private void SetBestScoreText()
+        public void ResetBestScoreText()
         {
             ScoreData highScoreData = ScoreManager.Instance.ScoreHelper.GetHighSCore();
             bool hasHighScore = highScoreData != null && highScoreData.Score > 0;
-            if (hasHighScore)
+            
+			if (hasHighScore)
             {
-                m_bestscoreTMP.SetText($"Best Score : {highScoreData.Name} : {highScoreData.Score}");
+				string bestScoreText = ScoreManager.Instance.FormatScoreText(highScoreData.Name, highScoreData.Score);
+                m_bestscoreTMP.SetText($"Best Score : {bestScoreText}");
             }
 
             m_bestscoreTMP.gameObject.SetActive(hasHighScore);
         }
+		#endregion
+
+		#region Internally Used Method(s):
 
 		private void InvokeOnGameOverEvent() => OnGameOverEvent?.Invoke();
 		private void InvokeInformNewGameEvent() => OnInformNewGameEvent?.Invoke();
@@ -84,6 +96,15 @@ namespace Project.Game
 		{
 			m_highscoreInputWindow.OnInputSubmittedEvent += HighscoreInputWindow_OnInputSubmittedCallback;
 			m_highscoreInputWindow.SetVisibility(true);
+		}
+		private void WaitForNewGameInput() => m_endGameCoroutine = StartCoroutine(WaitForNewGameInputCoroutine());
+		private void StopEndGameCoroutine()
+		{
+			if (m_endGameCoroutine != null)
+			{
+				StopCoroutine(m_endGameCoroutine);
+				m_endGameCoroutine = null;
+			}
 		}
         #endregion
 
@@ -95,41 +116,55 @@ namespace Project.Game
 			ScoreData highscoreData = ScoreManager.Instance.ScoreHelper.GetHighSCore();
 
 			if (highscoreData == null || m_currentScore > highscoreData.Score)
-			{
-				GetHighscoreInput();
-			}
-			else
-			{
-				InvokeInformNewGameEvent();
-			}
+				 { GetHighscoreInput(); }
+			else { WaitForNewGameInput(); }
 		}
 
+        private void BrickManager_OnWinConditionCallback()
+        {
+            Debug.Log("You won!");
+			DeathZone_OnGameOverCallback();
+
+        }
         private void HighscoreInputWindow_OnInputSubmittedCallback(string _inputValue)
         {
             m_highscoreInputWindow.OnInputSubmittedEvent -= HighscoreInputWindow_OnInputSubmittedCallback;
 			m_highscoreInputWindow.SetVisibility(false);
 			ScoreManager.Instance.ScoreHelper.SetScore(_inputValue, m_currentScore);
-			SetBestScoreText();
-			StartCoroutine(WaitForNewGameInput());
+			ResetBestScoreText();
+			WaitForNewGameInput();
         }
+
+		private void InputManager_OnSpaceBarInputCallback()
+		{
+			StopEndGameCoroutine();
+			InputManager.Instance.OnSpaceBarInputEvent -= InputManager_OnSpaceBarInputCallback;
+			InputManager.Instance.OnEscButtonInputEvent -= InputManager_OnEscButtonInputCallback;
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+		}
+
+		private void InputManager_OnEscButtonInputCallback()
+		{
+			StopEndGameCoroutine();
+			InputManager.Instance.OnSpaceBarInputEvent -= InputManager_OnSpaceBarInputCallback;
+			InputManager.Instance.OnEscButtonInputEvent -= InputManager_OnEscButtonInputCallback;
+			SceneManager.LoadScene(0);
+		}
 		#endregion
 
 		#region Coroutine(s):
 		private bool m_hasNewGameInput = false;
-		private IEnumerator WaitForNewGameInput()
+		private IEnumerator WaitForNewGameInputCoroutine()
 		{
 			InvokeInformNewGameEvent();
-			InputManager.Instance.OnSpaceBarInputEvent += HasNewInput;
+
+			InputManager.Instance.OnSpaceBarInputEvent += InputManager_OnSpaceBarInputCallback;
+			InputManager.Instance.OnEscButtonInputEvent += InputManager_OnEscButtonInputCallback;
 
 			while(!m_hasNewGameInput)
 			{
 				yield return null;
 			}
-
-			InputManager.Instance.OnSpaceBarInputEvent -= HasNewInput;
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
-			void HasNewInput() => m_hasNewGameInput = true;
 		}
 		#endregion
 	}

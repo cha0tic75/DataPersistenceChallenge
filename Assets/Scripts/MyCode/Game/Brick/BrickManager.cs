@@ -4,15 +4,25 @@
 // Written by Tim McCune <tim.mccune1975@gmail.com>
 // ######################################################################
 
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Project.Game
 {
     public class BrickManager : MonoBehaviour
 	{
+		#region Event/Delegate(s):
+		public event Action OnWinConditionEvent;
+		#endregion
+
 		#region Inspector Assigned Field(s):
 		[SerializeField] private Brick m_brickPrefab;
 		[SerializeField] private int m_lineCount = 6;
+		#endregion
+
+		#region Internal State Field(s):
+		private List<Brick> m_currentBricks = new List<Brick>();
 		#endregion
 
 		#region MonoBehaviour Callback Method(s):
@@ -29,14 +39,29 @@ namespace Project.Game
 					Vector3 position = new Vector3(-1.5f + step * x, 2.5f + i * 0.3f, 0);
 					var brick = Instantiate(m_brickPrefab, position, Quaternion.identity, transform);
 					brick.PointValue = pointCountArray[i];
-					brick.onDestroyed.AddListener(AwardPoints);
+					// brick.onDestroyed.AddListener(AwardPoints);
+					brick.OnBrickDestroyedEvent += Brick_OnBrickDestroyedCallback;
+					m_currentBricks.Add(brick);
 				}
 			}
 		}
-		#endregion
 
-		#region Internally Used Method(s):
-		private void AwardPoints(int _point) => GameManager.Instance.AwardPoints(_point);
-		#endregion
+        private void Brick_OnBrickDestroyedCallback(Brick _brick)
+        {
+			GameManager.Instance.AwardPoints(_brick.PointValue);
+
+			m_currentBricks.Remove(_brick);
+			Destroy(_brick.gameObject);
+
+			if (m_currentBricks.Count == 0)
+			{
+				OnWinConditionEvent?.Invoke();
+			}
+        }
+        #endregion
+
+        // #region Internally Used Method(s):
+        // private void AwardPoints(int _point) => GameManager.Instance.AwardPoints(_point);
+		// #endregion
 	}
 }

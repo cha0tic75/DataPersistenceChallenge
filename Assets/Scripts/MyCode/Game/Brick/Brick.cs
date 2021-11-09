@@ -4,15 +4,20 @@
 // Written by Tim McCune <tim.mccune1975@gmail.com>
 // ######################################################################
 
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Project.Game
 {
 	public class Brick : MonoBehaviour
-	{	
+	{
+		#region Event/Delegate(s):
+		public event Action<Brick> OnBrickDestroyedEvent;
+		#endregion
+
 		#region Properties:
-    	public UnityEvent<int> onDestroyed;
+    	// public UnityEvent<int> onDestroyed;
    		public int PointValue { get; set; }
 		#endregion
 
@@ -36,10 +41,11 @@ namespace Project.Game
 
 		private void OnCollisionEnter(Collision other)
 		{
-			onDestroyed.Invoke(PointValue);
+			OnBrickDestroyedEvent?.Invoke(this);
+			// onDestroyed.Invoke(PointValue);
 			
-			//slight delay to be sure the ball have time to bounce
-			Destroy(gameObject, 0.2f);
+			// //slight delay to be sure the ball have time to bounce
+			// Destroy(gameObject, 0.2f);
 		}
 		#endregion
 	}

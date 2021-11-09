@@ -4,11 +4,12 @@
 // Written by Tim McCune <tim.mccune1975@gmail.com>
 // ######################################################################
 
-using System;
 using System.IO;
 using UnityEngine;
 
-namespace Project.Persistence
+// TODO: Finish Implementing the TopTen system
+
+namespace Project
 {
     public class ScoreHelper
 	{
@@ -39,9 +40,11 @@ namespace Project.Persistence
 
         public ScoreData GetScoreByRank(int _rank) => (_rank >= 0 && _rank < TopTen.Data.Length) ? TopTen.Data[_rank] : null;
 
-        public void SetScore(string _inputValue, int _score)
+        public void SetScore(string _name, int _score)
         {
-            TopTen.Data[0] = new ScoreData() {Name = _inputValue, Score = _score};
+			string nameString = (!string.IsNullOrEmpty(_name) ? _name : $"<mark><size=80%><i>anonymous</i></size></mark>");
+
+            TopTen.Data[0] = new ScoreData() {Name = nameString, Score = _score};
 			SaveData();
         }
 

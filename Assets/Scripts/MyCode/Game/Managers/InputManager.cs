@@ -15,6 +15,7 @@ namespace Project.Game
 		#region Event/Delegate(s):
 		public event Action<float> OnHorizontalInputEvent;
 		public event Action OnSpaceBarInputEvent;
+		public event Action OnEscButtonInputEvent;
 		#endregion
 
 
@@ -35,6 +36,7 @@ namespace Project.Game
 		private void Update()
 		{
 			if (Input.GetKeyDown(KeyCode.Space)) { OnSpaceBarInputEvent?.Invoke(); }
+			if (Input.GetKeyDown(KeyCode.Escape)) { OnEscButtonInputEvent?.Invoke(); }
 			
 			if (m_inputEnabled)
 			{

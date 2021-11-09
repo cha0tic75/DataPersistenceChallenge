@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace Project.Game
+namespace Project
 {
     public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
 	{

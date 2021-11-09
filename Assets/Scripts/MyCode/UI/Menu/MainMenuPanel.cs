@@ -8,13 +8,15 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using TMPro;
 
 namespace Project.UI
 {
-    public class MainMenuPanel : MonoBehaviour
+    public class MainMenuPanel : MenuPanelItem
 	{
         #region Inspector Assigned Field(s):
-		[SerializeField] private HighScorePanel m_highScorePanel;
+		[SerializeField] private GameObject m_highScorePanel;
+        [SerializeField] private TextMeshProUGUI m_highScoreText; 
         #endregion
 
         #region MonoBehaviour Callback Method(s):
@@ -26,7 +28,7 @@ namespace Project.UI
 
             if (hasHighscore)
             {
-                m_highScorePanel.SetData(highscoreData);
+                m_highScoreText.SetText(ScoreManager.Instance.FormatScoreText(highscoreData.Name, highscoreData.Score));
             }
 
             m_highScorePanel.gameObject.SetActive(hasHighscore);
@@ -39,7 +41,7 @@ namespace Project.UI
 
 		public void OnTopTenButtonClicked()
 		{
-            // TODO: Coming soon to a theater near you!
+            InvokeCurrentMenuStateChangeRequest(MenuState.TopTen);
 		}
 
 		public void OnExitButtonClicked()
