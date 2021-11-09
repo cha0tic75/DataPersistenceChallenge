@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace Project.Game
 {
+	[DefaultExecutionOrder(-1)]
     public class InputManager : SingletonMonoBehaviour<InputManager>
 	{
 		#region Event/Delegate(s):

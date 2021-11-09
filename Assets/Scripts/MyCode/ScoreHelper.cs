@@ -4,6 +4,7 @@
 // Written by Tim McCune <tim.mccune1975@gmail.com>
 // ######################################################################
 
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -36,7 +37,13 @@ namespace Project.Persistence
 		#region Public API:
 		public ScoreData GetHighSCore() => GetScoreByRank(0);
 
-        public ScoreData GetScoreByRank(int _rank) => (_rank >= 0 && _rank < 10) ? TopTen.Data[_rank] : null;
+        public ScoreData GetScoreByRank(int _rank) => (_rank >= 0 && _rank < TopTen.Data.Length) ? TopTen.Data[_rank] : null;
+
+        public void SetScore(string _inputValue, int _score)
+        {
+            TopTen.Data[0] = new ScoreData() {Name = _inputValue, Score = _score};
+			SaveData();
+        }
 
         public void SaveData()
 		{
@@ -63,6 +70,6 @@ namespace Project.Persistence
 		{
 			public ScoreData[] Data = new ScoreData[10];
 		}
-		#endregion
-	}
+        #endregion
+    }
 }

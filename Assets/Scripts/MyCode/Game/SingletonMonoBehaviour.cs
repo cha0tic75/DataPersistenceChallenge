@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace Project.Game
 {
-	[DefaultExecutionOrder(-1)]
     public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
 	{
 		#region Inspector Assigned Field(s):

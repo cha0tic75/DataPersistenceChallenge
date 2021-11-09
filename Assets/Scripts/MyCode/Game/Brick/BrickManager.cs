@@ -29,17 +29,14 @@ namespace Project.Game
 					Vector3 position = new Vector3(-1.5f + step * x, 2.5f + i * 0.3f, 0);
 					var brick = Instantiate(m_brickPrefab, position, Quaternion.identity, transform);
 					brick.PointValue = pointCountArray[i];
-					brick.onDestroyed.AddListener(AddPoint);
+					brick.onDestroyed.AddListener(AwardPoints);
 				}
 			}
 		}
 		#endregion
 
 		#region Internally Used Method(s):
-		private void AddPoint(int _point)
-		{
-			GameManager.Instance.AddPoint(_point);
-		}
+		private void AwardPoints(int _point) => GameManager.Instance.AwardPoints(_point);
 		#endregion
 	}
 }

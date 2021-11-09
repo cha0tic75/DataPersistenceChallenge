@@ -41,5 +41,12 @@ namespace Project
             ScoreHelper.LoadData();
         }
         #endregion
+
+        #region Debug:
+        public void ResetTopScore()
+        {
+			ScoreManager.Instance.ScoreHelper.SetScore("", 0);
+        }
+        #endregion
 	}
 }
